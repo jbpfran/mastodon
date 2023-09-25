@@ -92,6 +92,9 @@ GEM
     activejob (7.0.7)
       activesupport (= 7.0.7)
       globalid (>= 0.3.6)
+    activejob-uniqueness (0.2.5)
+      activejob (>= 4.2, < 7.1)
+      redlock (>= 1.2, < 2)
     activemodel (7.0.7)
       activesupport (= 7.0.7)
     activerecord (7.0.7)
@@ -271,6 +274,8 @@ GEM
     fabrication (2.30.0)
     faker (3.2.1)
       i18n (>= 1.8.11, < 2)
+    faktory_worker_ruby (1.3.0)
+      connection_pool (~> 2.2, >= 2.2.2)
     faraday (1.10.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -815,6 +820,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers (~> 0.10)
+  activejob-uniqueness
   addressable (~> 2.8)
   annotate (~> 3.2)
   aws-sdk-s3 (~> 1.123)
@@ -847,6 +853,7 @@ DEPENDENCIES
   ed25519 (~> 1.3)
   fabrication (~> 2.30)
   faker (~> 3.2)
+  faktory_worker_ruby
   fast_blank (~> 1.0)
   fastimage
   fog-core (<= 2.4.0)
@@ -919,6 +926,7 @@ DEPENDENCIES
   ruby-prof
   ruby-progressbar (~> 1.13)
   rubyzip (~> 2.3)
+  rufus-scheduler
   sanitize (~> 6.0)
   scenic (~> 1.7)
   selenium-webdriver

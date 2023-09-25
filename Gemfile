@@ -50,8 +50,7 @@ gem 'doorkeeper', '~> 5.6'
 gem 'ed25519', '~> 1.3'
 gem 'fast_blank', '~> 1.0'
 gem 'fastimage'
-gem 'hiredis', '~> 0.6'
-gem 'redis-namespace', '~> 1.10'
+
 gem 'htmlentities', '~> 4.3'
 gem 'http', '~> 5.1'
 gem 'http_accept_language', '~> 2.1'
@@ -74,16 +73,12 @@ gem 'rack-cors', '~> 2.0', require: 'rack/cors'
 gem 'rails-i18n', '~> 7.0'
 gem 'rails-settings-cached', '~> 0.6', git: 'https://github.com/mastodon/rails-settings-cached.git', branch: 'v0.6.6-aliases-true'
 gem 'redcarpet', '~> 3.6'
-gem 'redis', '~> 4.5', require: ['redis', 'redis/connection/hiredis']
-gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
+
 gem 'rqrcode', '~> 2.2'
 gem 'ruby-progressbar', '~> 1.13'
 gem 'sanitize', '~> 6.0'
 gem 'scenic', '~> 1.7'
-gem 'sidekiq', '~> 6.5'
-gem 'sidekiq-scheduler', '~> 5.0'
-gem 'sidekiq-unique-jobs', '~> 7.1'
-gem 'sidekiq-bulk', '~> 0.2.0'
+
 gem 'simple-navigation', '~> 4.4'
 gem 'simple_form', '~> 5.2'
 gem 'sprockets-rails', '~> 3.4', require: 'sprockets/railtie'
@@ -196,7 +191,6 @@ group :production do
 end
 
 gem 'concurrent-ruby', require: false
-gem 'connection_pool', require: false
 gem 'xorcist', '~> 1.1'
 gem 'cocoon', '~> 1.2'
 
@@ -204,3 +198,24 @@ gem 'net-http', '~> 0.3.2'
 gem 'rubyzip', '~> 2.3'
 
 gem 'hcaptcha', '~> 7.1'
+
+##  Background Jobs
+### Background Jobs : Infrastructure & Prerequisites
+gem 'hiredis', '~> 0.6'
+gem 'redis-namespace', '~> 1.10'
+gem 'redis', '~> 4.5', require: ['redis', 'redis/connection/hiredis']
+gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
+gem 'connection_pool', require: false
+
+### Background Jobs : Queue Independant Compenents
+gem 'rufus-scheduler' # same job scheduler as in sidekiq-scheduler [https://github.com/jmettraux/rufus-scheduler]
+gem 'activejob-uniqueness' # Unique jobs for ActiveJob. Ensure the uniqueness of jobs in the queue. [https://github.com/veeqo/activejob-uniqueness]
+
+### Background Jobs Queue Adapter : Sidekiq
+gem 'sidekiq', '~> 6.5'
+gem 'sidekiq-scheduler', '~> 5.0'
+gem 'sidekiq-unique-jobs', '~> 7.1'
+gem 'sidekiq-bulk', '~> 0.2.0'
+
+### Background Jobs Queue Adapter : Faktory
+gem 'faktory_worker_ruby'
