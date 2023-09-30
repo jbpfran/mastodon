@@ -18,7 +18,7 @@ class BootstrapTimelineService < BaseService
 
   def notify_staff!
     User.those_who_can(:manage_users).includes(:account).find_each do |user|
-      LocalNotificationWorker.perform_async(user.account_id, @source_account.id, 'Account', 'admin.sign_up')
+      LocalNotificationJob.perform_later(user.account_id, @source_account.id, 'Account', 'admin.sign_up')
     end
   end
 end

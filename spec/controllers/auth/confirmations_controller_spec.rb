@@ -18,7 +18,7 @@ describe Auth::ConfirmationsController do
       let!(:user) { Fabricate(:user, confirmation_token: 'foobar', confirmed_at: nil) }
 
       before do
-        allow(BootstrapTimelineWorker).to receive(:perform_async)
+        allow(BootstrapTimelineJob).to receive(:perform_later)
         @request.env['devise.mapping'] = Devise.mappings[:user]
         get :show, params: { confirmation_token: 'foobar' }
       end
@@ -28,7 +28,7 @@ describe Auth::ConfirmationsController do
       end
 
       it 'queues up bootstrapping of home timeline' do
-        expect(BootstrapTimelineWorker).to have_received(:perform_async).with(user.account_id)
+        expect(BootstrapTimelineJob).to have_received(:perform_later).with(user.account_id)
       end
     end
 
@@ -36,7 +36,7 @@ describe Auth::ConfirmationsController do
       let!(:user) { Fabricate(:user, confirmation_token: 'foobar', confirmed_at: nil, approved: false) }
 
       before do
-        allow(BootstrapTimelineWorker).to receive(:perform_async)
+        allow(BootstrapTimelineJob).to receive(:perform_later)
         @request.env['devise.mapping'] = Devise.mappings[:user]
         get :show, params: { confirmation_token: 'foobar' }
       end
@@ -50,7 +50,7 @@ describe Auth::ConfirmationsController do
       let!(:user) { Fabricate(:user) }
 
       before do
-        allow(BootstrapTimelineWorker).to receive(:perform_async)
+        allow(BootstrapTimelineJob).to receive(:perform_later)
         @request.env['devise.mapping'] = Devise.mappings[:user]
         sign_in(user, scope: :user)
         get :show, params: { confirmation_token: 'foobar' }
@@ -65,7 +65,7 @@ describe Auth::ConfirmationsController do
       let!(:user) { Fabricate(:user, approved: false) }
 
       before do
-        allow(BootstrapTimelineWorker).to receive(:perform_async)
+        allow(BootstrapTimelineJob).to receive(:perform_later)
         @request.env['devise.mapping'] = Devise.mappings[:user]
         user.approved = false
         user.save!
@@ -82,7 +82,7 @@ describe Auth::ConfirmationsController do
       let!(:user) { Fabricate(:user, confirmation_token: 'foobar', unconfirmed_email: 'new-email@example.com') }
 
       before do
-        allow(BootstrapTimelineWorker).to receive(:perform_async)
+        allow(BootstrapTimelineJob).to receive(:perform_later)
         @request.env['devise.mapping'] = Devise.mappings[:user]
         get :show, params: { confirmation_token: 'foobar' }
       end
@@ -92,7 +92,7 @@ describe Auth::ConfirmationsController do
       end
 
       it 'does not queue up bootstrapping of home timeline' do
-        expect(BootstrapTimelineWorker).to_not have_received(:perform_async)
+        expect(BootstrapTimelineJob).to_not have_received(:perform_later)
       end
     end
   end

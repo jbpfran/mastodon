@@ -51,7 +51,7 @@ class VoteService < BaseService
   def queue_final_poll_check!
     return unless @poll.expires?
 
-    PollExpirationNotifyWorker.perform_at(@poll.expires_at + 5.minutes, @poll.id)
+    PollExpirationNotifyJob.set(wait_until: @poll.expires_at + 5.minutes).perform_at(@poll.id)
   end
 
   def deliver_votes!

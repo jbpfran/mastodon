@@ -33,7 +33,7 @@ class Api::V1::Admin::DomainBlocksController < Api::BaseController
     return render json: existing_domain_block, serializer: REST::Admin::ExistingDomainBlockErrorSerializer, status: 422 if existing_domain_block.present?
 
     @domain_block = DomainBlock.create!(resource_params)
-    DomainBlockWorker.perform_async(@domain_block.id)
+    DomainBlockJob.perform_later(@domain_block.id)
     log_action :create, @domain_block
     render json: @domain_block, serializer: REST::Admin::DomainBlockSerializer
   end
@@ -41,7 +41,7 @@ class Api::V1::Admin::DomainBlocksController < Api::BaseController
   def update
     authorize @domain_block, :update?
     @domain_block.update!(domain_block_params)
-    DomainBlockWorker.perform_async(@domain_block.id, @domain_block.severity_previously_changed?)
+    DomainBlockJob.perform_later(@domain_block.id, @domain_block.severity_previously_changed?)
     log_action :update, @domain_block
     render json: @domain_block, serializer: REST::Admin::DomainBlockSerializer
   end

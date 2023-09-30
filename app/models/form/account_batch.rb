@@ -112,7 +112,7 @@ class Form::AccountBatch
     authorize(account.user, :reject?)
     log_action(:reject, account.user)
     account.suspend!(origin: :local)
-    AccountDeletionWorker.perform_async(account.id, { 'reserve_username' => false })
+    AccountDeletionJob.perform_later(account.id, { 'reserve_username' => false })
   end
 
   def suspend_account(account)

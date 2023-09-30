@@ -81,7 +81,7 @@ RSpec.describe ResolveAccountService, type: :service do
     context 'with a previously known account' do
       before do
         Fabricate(:account, username: 'hoge', domain: 'example.com', last_webfingered_at: nil)
-        allow(AccountDeletionWorker).to receive(:perform_async)
+        allow(AccountDeletionJob).to receive(:perform_later)
       end
 
       it 'returns nil' do
@@ -90,7 +90,7 @@ RSpec.describe ResolveAccountService, type: :service do
 
       it 'queues account deletion worker' do
         subject.call('hoge@example.com')
-        expect(AccountDeletionWorker).to have_received(:perform_async)
+        expect(AccountDeletionJob).to have_received(:perform_later)
       end
     end
 

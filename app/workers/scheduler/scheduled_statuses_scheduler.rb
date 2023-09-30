@@ -15,7 +15,7 @@ class Scheduler::ScheduledStatusesScheduler
 
   def publish_scheduled_statuses!
     due_statuses.find_each do |scheduled_status|
-      PublishScheduledStatusWorker.perform_at(scheduled_status.scheduled_at, scheduled_status.id)
+      PublishScheduledStatusJob.set(wait_until: scheduled_status.scheduled_at).perform_later(scheduled_status.id)
     end
   end
 
@@ -25,7 +25,7 @@ class Scheduler::ScheduledStatusesScheduler
 
   def publish_scheduled_announcements!
     due_announcements.find_each do |announcement|
-      PublishScheduledAnnouncementWorker.perform_at(announcement.scheduled_at, announcement.id)
+      PublishScheduledAnnouncementJob.perform_later(announcement.scheduled_at, announcement.id)
     end
   end
 

@@ -489,7 +489,7 @@ module Mastodon::CLI
           processed += 1
         end
 
-        BootstrapTimelineWorker.perform_async(account.id)
+        BootstrapTimelineJob.perform_later(account.id)
       end
 
       if options[:followers]

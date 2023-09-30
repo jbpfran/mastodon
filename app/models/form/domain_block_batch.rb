@@ -28,7 +28,7 @@ class Form::DomainBlockBatch
       next if DomainBlock.rule_for(domain_block.domain).present?
 
       domain_block.save!
-      DomainBlockWorker.perform_async(domain_block.id)
+      DomainBlockJob.perform_later(domain_block.id)
       log_action :create, domain_block
     end
   end

@@ -12,7 +12,7 @@ class BlockService < BaseService
 
     block = account.block!(target_account)
 
-    BlockWorker.perform_async(account.id, target_account.id)
+    BlockJob.perform_later(account.id, target_account.id)
     create_notification(block) if !target_account.local? && target_account.activitypub?
     block
   end

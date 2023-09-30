@@ -1290,12 +1290,12 @@ describe Mastodon::CLI::Accounts do
           expect(target_account.reload.following).to be_empty
         end
 
-        it 'calls BootstrapTimelineWorker once to rebuild the timeline' do
-          allow(BootstrapTimelineWorker).to receive(:perform_async)
+        it 'calls BootstrapTimelineJob once to rebuild the timeline' do
+          allow(BootstrapTimelineJob).to receive(:perform_later)
 
           cli.invoke(:reset_relationships, arguments, options)
 
-          expect(BootstrapTimelineWorker).to have_received(:perform_async).with(target_account.id).once
+          expect(BootstrapTimelineJob).to have_received(:perform_later).with(target_account.id).once
         end
 
         it 'displays a successful message' do
@@ -1345,12 +1345,12 @@ describe Mastodon::CLI::Accounts do
           expect(target_account.reload.following).to be_empty
         end
 
-        it 'calls BootstrapTimelineWorker once to rebuild the timeline' do
-          allow(BootstrapTimelineWorker).to receive(:perform_async)
+        it 'calls BootstrapTimelineJob once to rebuild the timeline' do
+          allow(BootstrapTimelineJob).to receive(:perform_later)
 
           cli.invoke(:reset_relationships, arguments, options)
 
-          expect(BootstrapTimelineWorker).to have_received(:perform_async).with(target_account.id).once
+          expect(BootstrapTimelineJob).to have_received(:perform_later).with(target_account.id).once
         end
 
         it 'displays a successful message' do

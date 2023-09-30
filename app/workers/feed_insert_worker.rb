@@ -73,7 +73,7 @@ class FeedInsertWorker
   end
 
   def perform_notify
-    LocalNotificationWorker.perform_async(@follower.id, @status.id, 'Status', 'status')
+    LocalNotificationLater.perform_later(@follower.id, @status.id, 'Status', 'status')
   end
 
   def update?

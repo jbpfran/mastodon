@@ -130,9 +130,12 @@ class BulkImportService < BaseService
     domains.each { |domain| @account.block_domain!(domain) }
     @import.update!(processed_items: @import.total_items, imported_items: @import.total_items)
 
-    AfterAccountDomainBlockWorker.push_bulk(domains) do |domain|
-      [@account.id, domain]
+    domains.each do |domain|
+      AfterAccountDomainBlockJob.perform_later(@account.id, domain)
     end
+    # AfterAccountDomainBlockWorker.push_bulk(domains) do |domain|
+    #  [@account.id, domain]
+    # end
   end
 
   def import_bookmarks!

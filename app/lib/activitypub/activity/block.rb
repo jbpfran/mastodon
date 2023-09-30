@@ -16,7 +16,7 @@ class ActivityPub::Activity::Block < ActivityPub::Activity
     RejectFollowService.new.call(target_account, @account) if target_account.requested?(@account)
 
     unless delete_arrived_first?(@json['id'])
-      BlockWorker.perform_async(@account.id, target_account.id)
+      BlockJob.perform_later(@account.id, target_account.id)
       @account.block!(target_account, uri: @json['id'])
     end
   end

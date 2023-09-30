@@ -67,16 +67,16 @@ class FanOutOnWriteService < BaseService
 
   def notify_mentioned_accounts!
     @status.active_mentions.where.not(id: @options[:silenced_account_ids] || []).joins(:account).merge(Account.local).select(:id, :account_id).reorder(nil).find_in_batches do |mentions|
-      LocalNotificationWorker.push_bulk(mentions) do |mention|
-        [mention.account_id, mention.id, 'Mention', 'mention']
+      mentions.each do |mention|
+        LocalNotificationJob.perform_later(mention.account_id, mention.id, 'Mention', 'mention')
       end
     end
   end
 
   def notify_about_update!
     @status.reblogged_by_accounts.merge(Account.local).select(:id).reorder(nil).find_in_batches do |accounts|
-      LocalNotificationWorker.push_bulk(accounts) do |account|
-        [account.id, @status.id, 'Status', 'update']
+      accounts.each do |account|
+        LocalNotificationJob.perform_later(account.id, @status.id, 'Status', 'update')
       end
     end
   end

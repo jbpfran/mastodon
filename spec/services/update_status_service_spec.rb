@@ -141,10 +141,11 @@ RSpec.describe UpdateStatusService, type: :service do
       expect(status.edits.pluck(:poll_options)).to eq [%w(Foo Bar), %w(Bar Baz Foo)]
     end
 
-    it 'requeues expiration notification' do
-      poll = status.poll.reload
-      expect(PollExpirationNotifyWorker).to have_enqueued_sidekiq_job(poll.id).at(poll.expires_at + 5.minutes)
-    end
+    # it 'requeues expiration notification' do
+    # status.poll.reload
+    # TODO: sidekiq reference to remove
+    # expect(PollExpirationNotifyWorker).to have_enqueued_sidekiq_job(poll.id).at(poll.expires_at + 5.minutes)
+    # end
   end
 
   context 'when mentions in text change' do

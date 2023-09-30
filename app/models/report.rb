@@ -160,10 +160,10 @@ class Report < ApplicationRecord
   end
 
   def trigger_create_webhooks
-    TriggerWebhookWorker.perform_async('report.created', 'Report', id)
+    TriggerWebhookJob.perform_later('report.created', 'Report', id)
   end
 
   def trigger_update_webhooks
-    TriggerWebhookWorker.perform_async('report.updated', 'Report', id)
+    TriggerWebhookJob.perform_later('report.updated', 'Report', id)
   end
 end

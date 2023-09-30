@@ -7,12 +7,12 @@ class MuteService < BaseService
     mute = account.mute!(target_account, notifications: notifications, duration: duration)
 
     if mute.hide_notifications?
-      BlockWorker.perform_async(account.id, target_account.id)
+      BlockJob.perform_later(account.id, target_account.id)
     else
-      MuteWorker.perform_async(account.id, target_account.id)
+      MuteJob.perform_later(account.id, target_account.id)
     end
 
-    DeleteMuteWorker.perform_at(duration.seconds, mute.id) if duration != 0
+    DeleteMuteJob.set(wait: duration.seconds).perform_later(mute.id) if duration != 0
 
     mute
   end

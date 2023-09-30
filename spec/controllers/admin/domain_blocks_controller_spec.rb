@@ -20,7 +20,7 @@ RSpec.describe Admin::DomainBlocksController do
 
   describe 'POST #batch' do
     it 'blocks the domains when succeeded to save' do
-      allow(DomainBlockWorker).to receive(:perform_async).and_return(true)
+      allow(DomainBlockJob).to receive(:perform_later).and_return(true)
 
       post :batch, params: {
         save: '',
@@ -33,7 +33,7 @@ RSpec.describe Admin::DomainBlocksController do
         },
       }
 
-      expect(DomainBlockWorker).to have_received(:perform_async).exactly(2).times
+      expect(DomainBlockJob).to have_received(:perform_later).exactly(2).times
       expect(flash[:notice]).to eq I18n.t('admin.domain_blocks.created_msg')
       expect(response).to redirect_to(admin_instances_path(limited: '1'))
     end
@@ -41,7 +41,7 @@ RSpec.describe Admin::DomainBlocksController do
 
   describe 'POST #create' do
     before do
-      allow(DomainBlockWorker).to receive(:perform_async).and_return(true)
+      allow(DomainBlockJob).to receive(:perform_later).and_return(true)
     end
 
     context 'with "silence" severity and no conflict' do
@@ -53,8 +53,8 @@ RSpec.describe Admin::DomainBlocksController do
         expect(DomainBlock.exists?(domain: 'example.com', severity: 'silence')).to be true
       end
 
-      it 'calls DomainBlockWorker' do
-        expect(DomainBlockWorker).to have_received(:perform_async)
+      it 'calls DomainBlockJob' do
+        expect(DomainBlockJob).to have_received(:perform_later)
       end
 
       it 'redirects with a success message' do
@@ -73,8 +73,8 @@ RSpec.describe Admin::DomainBlocksController do
         expect(DomainBlock.exists?(domain: 'example.com', severity: 'silence')).to be false
       end
 
-      it 'does not call DomainBlockWorker' do
-        expect(DomainBlockWorker).to_not have_received(:perform_async)
+      it 'does not call DomainBlockJob' do
+        expect(DomainBlockJob).to_not have_received(:perform_later)
       end
 
       it 'renders new' do
@@ -92,8 +92,8 @@ RSpec.describe Admin::DomainBlocksController do
           expect(DomainBlock.exists?(domain: 'example.com', severity: 'suspend')).to be false
         end
 
-        it 'does not call DomainBlockWorker' do
-          expect(DomainBlockWorker).to_not have_received(:perform_async)
+        it 'does not call DomainBlockJob' do
+          expect(DomainBlockJob).to_not have_received(:perform_later)
         end
 
         it 'renders confirm_suspension' do
@@ -110,8 +110,8 @@ RSpec.describe Admin::DomainBlocksController do
           expect(DomainBlock.exists?(domain: 'example.com', severity: 'suspend')).to be true
         end
 
-        it 'calls DomainBlockWorker' do
-          expect(DomainBlockWorker).to have_received(:perform_async)
+        it 'calls DomainBlockJob' do
+          expect(DomainBlockJob).to have_received(:perform_later)
         end
 
         it 'redirects with a success message' do
@@ -135,8 +135,8 @@ RSpec.describe Admin::DomainBlocksController do
           expect(DomainBlock.exists?(domain: 'example.com', severity: 'suspend')).to be false
         end
 
-        it 'does not call DomainBlockWorker' do
-          expect(DomainBlockWorker).to_not have_received(:perform_async)
+        it 'does not call DomainBlockJob' do
+          expect(DomainBlockJob).to_not have_received(:perform_later)
         end
 
         it 'renders confirm_suspension' do
@@ -153,8 +153,8 @@ RSpec.describe Admin::DomainBlocksController do
           expect(DomainBlock.exists?(domain: 'example.com', severity: 'suspend')).to be true
         end
 
-        it 'calls DomainBlockWorker' do
-          expect(DomainBlockWorker).to have_received(:perform_async)
+        it 'calls DomainBlockJob' do
+          expect(DomainBlockJob).to have_received(:perform_later)
         end
 
         it 'redirects with a success message' do

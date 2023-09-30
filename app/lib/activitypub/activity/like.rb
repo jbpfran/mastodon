@@ -8,7 +8,7 @@ class ActivityPub::Activity::Like < ActivityPub::Activity
 
     favourite = original_status.favourites.create!(account: @account)
 
-    LocalNotificationWorker.perform_async(original_status.account_id, favourite.id, 'Favourite', 'favourite')
+    LocalNotificationJob.perform_later(original_status.account_id, favourite.id, 'Favourite', 'favourite')
     Trends.statuses.register(original_status)
   end
 end

@@ -18,7 +18,7 @@ class Api::V1::FeaturedTagsController < Api::BaseController
   end
 
   def destroy
-    RemoveFeaturedTagWorker.perform_async(current_account.id, @featured_tag.id)
+    RemoveFeaturedTagJob.perform_later(current_account.id, @featured_tag.id)
     render_empty
   end
 

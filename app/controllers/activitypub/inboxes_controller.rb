@@ -51,7 +51,7 @@ class ActivityPub::InboxesController < ActivityPub::BaseController
   def upgrade_account
     if signed_request_account&.ostatus?
       signed_request_account.update(last_webfingered_at: nil)
-      ResolveAccountWorker.perform_async(signed_request_account.acct)
+      ResolveAccountJob.perform_later(signed_request_account.acct)
     end
 
     DeliveryFailureTracker.reset!(signed_request_actor.inbox_url)

@@ -24,7 +24,7 @@ class FollowMigrationService < FollowService
     migrate_list_accounts!
 
     if @target_account.local?
-      LocalNotificationWorker.perform_async(@target_account.id, follow_request.id, follow_request.class.name, 'follow_request')
+      LocalNotificationJob.perform_later(@target_account.id, follow_request.id, follow_request.class.name, 'follow_request')
       UnfollowService.new.call(@source_account, @old_target_account, skip_unmerge: true)
     elsif @target_account.activitypub?
       ActivityPub::MigratedFollowDeliveryWorker.perform_async(build_json(follow_request), @source_account.id, @target_account.inbox_url, @old_target_account.id)

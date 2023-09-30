@@ -36,7 +36,7 @@ class EncryptedMessage < ApplicationRecord
   def push_to_streaming_api
     return if destroyed? || !subscribed_to_timeline?
 
-    PushEncryptedMessageWorker.perform_async(id)
+    PushEncryptedMessageJob.perform_later(id)
   end
 
   def subscribed_to_timeline?

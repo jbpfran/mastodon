@@ -457,11 +457,11 @@ class User < ApplicationRecord
   end
 
   def prepare_new_user!
-    BootstrapTimelineWorker.perform_async(account_id)
+    BootstrapTimelineJob.perform_later(account_id)
     ActivityTracker.increment('activity:accounts:local')
     ActivityTracker.record('activity:logins', id)
     UserMailer.welcome(self).deliver_later
-    TriggerWebhookWorker.perform_async('account.approved', 'Account', account_id)
+    TriggerWebhookJob.perform_later('account.approved', 'Account', account_id)
   end
 
   def prepare_returning_user!
@@ -480,7 +480,7 @@ class User < ApplicationRecord
   end
 
   def regenerate_feed!
-    RegenerationWorker.perform_async(account_id) if redis.set("account:#{account_id}:regeneration", true, nx: true, ex: 1.day.seconds)
+    RegenerationJob.perform_later(account_id) if redis.set("account:#{account_id}:regeneration", true, nx: true, ex: 1.day.seconds)
   end
 
   def needs_feed_update?
@@ -500,6 +500,6 @@ class User < ApplicationRecord
   end
 
   def trigger_webhooks
-    TriggerWebhookWorker.perform_async('account.created', 'Account', account_id)
+    TriggerWebhookJob.perform_later('account.created', 'Account', account_id)
   end
 end

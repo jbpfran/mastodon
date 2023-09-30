@@ -16,7 +16,9 @@ class RemoveBoostsWideningAudience < ActiveRecord::Migration[5.2]
         AND boosted.visibility = 2
     SQL
 
-    RemovalWorker.push_bulk(public_boosts.pluck(:id))
+    public_boosts.pluck(:id).each do |id|
+      RemovalJob.perform_later(id)
+    end
   end
 
   def down

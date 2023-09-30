@@ -297,8 +297,9 @@ class ActivityPub::ProcessStatusUpdateService < BaseService
 
     return unless poll.present? && poll.expires_at.present? && poll.votes.exists?
 
-    PollExpirationNotifyWorker.remove_from_scheduled(poll.id) if @previous_expires_at.present? && @previous_expires_at > poll.expires_at
-    PollExpirationNotifyWorker.perform_at(poll.expires_at + 5.minutes, poll.id)
+    # TODO: this is sidekiq related. How to remove a scheduled job with active job ?
+    PollExpirationNotifyJob.remove_from_scheduled(poll.id) if @previous_expires_at.present? && @previous_expires_at > poll.expires_at
+    PollExpirationNotifyJob.set(wait_until: poll.expires_at + 5.minutes).perform_later(poll.id)
   end
 
   def forward_activity!

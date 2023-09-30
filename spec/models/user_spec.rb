@@ -149,7 +149,7 @@ RSpec.describe User do
     let(:new_email) { 'new-email@example.com' }
 
     before do
-      allow(TriggerWebhookWorker).to receive(:perform_async)
+      allow(TriggerWebhookJob).to receive(:perform_later)
     end
 
     context 'when the user is already confirmed' do
@@ -161,7 +161,7 @@ RSpec.describe User do
 
       it 'does not trigger the account.approved Web Hook' do
         subject
-        expect(TriggerWebhookWorker).to_not have_received(:perform_async).with('account.approved', 'Account', user.account_id)
+        expect(TriggerWebhookJob).to_not have_received(:perform_later).with('account.approved', 'Account', user.account_id)
       end
     end
 
@@ -188,7 +188,7 @@ RSpec.describe User do
 
         it 'triggers the account.approved Web Hook' do
           user.confirm
-          expect(TriggerWebhookWorker).to have_received(:perform_async).with('account.approved', 'Account', user.account_id).once
+          expect(TriggerWebhookLater).to have_received(:perform_later).with('account.approved', 'Account', user.account_id).once
         end
       end
 
@@ -208,7 +208,7 @@ RSpec.describe User do
 
         it 'triggers the account.approved Web Hook' do
           user.confirm
-          expect(TriggerWebhookWorker).to have_received(:perform_async).with('account.approved', 'Account', user.account_id).once
+          expect(TriggerWebhookJob).to have_received(:perform_later).with('account.approved', 'Account', user.account_id).once
         end
       end
 
@@ -228,7 +228,7 @@ RSpec.describe User do
 
         it 'does not trigger the account.approved Web Hook' do
           subject
-          expect(TriggerWebhookWorker).to_not have_received(:perform_async).with('account.approved', 'Account', user.account_id)
+          expect(TriggerWebhookJob).to_not have_received(:perform_later).with('account.approved', 'Account', user.account_id)
         end
       end
     end
@@ -247,7 +247,7 @@ RSpec.describe User do
     end
 
     before do
-      allow(TriggerWebhookWorker).to receive(:perform_async)
+      allow(TriggerWebhookJob).to receive(:perform_later)
     end
 
     context 'when the user is already confirmed' do
@@ -259,7 +259,7 @@ RSpec.describe User do
 
       it 'triggers the account.approved Web Hook' do
         subject
-        expect(TriggerWebhookWorker).to have_received(:perform_async).with('account.approved', 'Account', user.account_id).once
+        expect(TriggerWebhookJob).to have_received(:perform_later).with('account.approved', 'Account', user.account_id).once
       end
     end
 
@@ -272,7 +272,7 @@ RSpec.describe User do
 
       it 'does not trigger the account.approved Web Hook' do
         subject
-        expect(TriggerWebhookWorker).to_not have_received(:perform_async).with('account.approved', 'Account', user.account_id)
+        expect(TriggerWebhookJob).to_not have_received(:perform_later).with('account.approved', 'Account', user.account_id)
       end
     end
   end

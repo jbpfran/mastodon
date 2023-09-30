@@ -61,16 +61,16 @@ describe UserTrackingConcern do
       end
 
       it 'sets a regeneration marker while regenerating' do
-        allow(RegenerationWorker).to receive(:perform_async)
+        allow(RegenerationJob).to receive(:perform_later)
         get :show
 
         expect_updated_sign_in_at(user)
         expect(redis.get("account:#{user.account_id}:regeneration")).to eq 'true'
-        expect(RegenerationWorker).to have_received(:perform_async)
+        expect(RegenerationJob).to have_received(:perform_later)
       end
 
       it 'sets the regeneration marker to expire' do
-        allow(RegenerationWorker).to receive(:perform_async)
+        allow(RegenerationJob).to receive(:perform_later)
         get :show
         expect(redis.ttl("account:#{user.account_id}:regeneration")).to be >= 0
       end

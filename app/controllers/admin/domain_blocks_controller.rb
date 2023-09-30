@@ -49,7 +49,7 @@ module Admin
       return render :confirm_suspension if requires_confirmation?
 
       if @domain_block.save
-        DomainBlockWorker.perform_async(@domain_block.id)
+        DomainBlockJob.perform_later(@domain_block.id)
         log_action :create, @domain_block
         redirect_to admin_instances_path(limited: '1'), notice: I18n.t('admin.domain_blocks.created_msg')
       else
@@ -66,7 +66,7 @@ module Admin
       return render :confirm_suspension if requires_confirmation?
 
       if @domain_block.save
-        DomainBlockWorker.perform_async(@domain_block.id, @domain_block.severity_previously_changed?)
+        DomainBlockJob.perform_later(@domain_block.id, @domain_block.severity_previously_changed?)
         log_action :update, @domain_block
         redirect_to admin_instances_path(limited: '1'), notice: I18n.t('admin.domain_blocks.created_msg')
       else

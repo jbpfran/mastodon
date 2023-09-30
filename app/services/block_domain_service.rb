@@ -26,7 +26,7 @@ class BlockDomainService < BaseService
       suspend_accounts!
     end
 
-    DomainClearMediaWorker.perform_async(domain_block.id) if domain_block.reject_media?
+    DomainClearMediaJob.perform_later(domain_block.id) if domain_block.reject_media?
   end
 
   def silence_accounts!

@@ -27,7 +27,7 @@ class Api::V1::Statuses::ReblogsController < Api::BaseController
       @reblog = @status.reblog
       count = [@reblog.reblogs_count - 1, 0].max
       @status.discard
-      RemovalWorker.perform_async(@status.id)
+      RemovalJob.perform_later(@status.id)
     else
       @reblog = Status.find(params[:status_id])
       count = @reblog.reblogs_count

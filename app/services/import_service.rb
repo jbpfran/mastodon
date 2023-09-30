@@ -61,11 +61,12 @@ class ImportService < BaseService
 
     items.each do |domain|
       @account.block_domain!(domain)
+      AfterAccountDomainBlockJob.perform_later(@account.id, domain)
     end
 
-    AfterAccountDomainBlockWorker.push_bulk(items) do |domain|
-      [@account.id, domain]
-    end
+    # AfterAccountDomainBlockWorker.push_bulk(items) do |domain|
+    #  [@account.id, domain]
+    # end
   end
 
   def import_relationships!(action, undo_action, overwrite_scope, limit, extra_fields = {})

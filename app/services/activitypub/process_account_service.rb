@@ -185,7 +185,7 @@ class ActivityPub::ProcessAccountService < BaseService
   def process_duplicate_accounts!
     return unless Account.where(uri: @account.uri).where.not(id: @account.id).exists?
 
-    AccountMergingWorker.perform_async(@account.id)
+    AccountMergingJob.perform_later(@account.id)
   end
 
   def actor_type

@@ -50,7 +50,8 @@ class Form::Import
     return :muting if data.original_filename&.start_with?('mutes') || data.original_filename&.start_with?('muted_accounts')
     return :domain_blocking if data.original_filename&.start_with?('domain_blocks') || data.original_filename&.start_with?('blocked_domains')
     return :bookmarks if data.original_filename&.start_with?('bookmarks')
-    return :lists if data.original_filename&.start_with?('lists')
+
+    :lists if data.original_filename&.start_with?('lists')
   end
 
   # Whether the uploaded CSV file seems to correspond to a different import type than the one selected

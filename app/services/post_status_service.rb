@@ -121,7 +121,7 @@ class PostStatusService < BaseService
     LinkCrawlWorker.perform_async(@status.id)
     DistributionWorker.perform_async(@status.id)
     ActivityPub::DistributionWorker.perform_async(@status.id)
-    PollExpirationNotifyWorker.perform_at(@status.poll.expires_at, @status.poll.id) if @status.poll
+    PollExpirationNotifyJob.set(wait_until: @status.poll.expires_at).perform_later(@status.poll.id) if @status.poll
   end
 
   def validate_media!

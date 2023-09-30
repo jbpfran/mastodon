@@ -85,7 +85,7 @@ class Scheduler::AccountsStatusesCleanupScheduler
   end
 
   def compute_budget
-    # Each post deletion is a `RemovalWorker` job (on `default` queue), each
+    # Each post deletion is a `RemovalJob` job (on `default` queue), each
     # potentially spawning many `ActivityPub::DeliveryWorker` jobs (on the `push` queue).
     threads = Sidekiq::ProcessSet.new.select { |x| x['queues'].include?('push') }.pluck('concurrency').sum
     [PER_THREAD_BUDGET * threads, MAX_BUDGET].min
