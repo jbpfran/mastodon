@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class Scheduler::UserCleanupScheduler
-  include Sidekiq::Worker
-
-  sidekiq_options retry: 0, lock: :until_executed, lock_ttl: 1.day.to_i
+class Scheduler::UserCleanupJob < ApplicationJob
+  queue_as :scheduler
+  unique :until_executed, lock_ttl: 1.day
+  discard_on StandardError
 
   def perform
     clean_unconfirmed_accounts!

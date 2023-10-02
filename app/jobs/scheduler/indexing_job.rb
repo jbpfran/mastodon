@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-class Scheduler::IndexingScheduler
-  include Sidekiq::Worker
+class Scheduler::IndexingJob < ApplicationJob
   include Redisable
 
-  sidekiq_options retry: 0, lock: :until_executed, lock_ttl: 1.day.to_i
+  queue_as :scheduler
+  unique :until_executed, lock_ttl: 1.day
+  discard_on StandardError
 
   IMPORT_BATCH_SIZE = 1000
   SCAN_BATCH_SIZE = 10 * IMPORT_BATCH_SIZE

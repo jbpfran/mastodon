@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Scheduler::PgheroScheduler do
+RSpec.describe Scheduler::VacuumJob do
   let(:worker) { described_class.new }
 
   describe 'perform' do

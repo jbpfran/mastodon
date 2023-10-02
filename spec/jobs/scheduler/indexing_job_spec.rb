@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Scheduler::IpCleanupScheduler do
+RSpec.describe Scheduler::IndexingJob do
   let(:worker) { described_class.new }
 
   describe 'perform' do

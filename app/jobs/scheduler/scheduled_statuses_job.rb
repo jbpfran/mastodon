@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class Scheduler::ScheduledStatusesScheduler
-  include Sidekiq::Worker
-
-  sidekiq_options retry: 0, lock: :until_executed, lock_ttl: 1.day.to_i
+class Scheduler::ScheduledStatusesJob < ApplicationJob
+  queue_as :scheduler
+  unique :until_executed, lock_ttl: 1.day
+  discard_on StandardError
 
   def perform
     publish_scheduled_statuses!
@@ -34,7 +34,7 @@ class Scheduler::ScheduledStatusesScheduler
   end
 
   def unpublish_expired_announcements!
-    expired_announcements.in_batches.update_all(published: false, scheduled_at: nil)
+    expired_announcements.in_batches.update_all(published: false, scheduled_at: nil) # rubocop:disable Rails/SkipsModelValidations
   end
 
   def expired_announcements
