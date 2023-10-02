@@ -67,7 +67,7 @@ class Api::V1::Admin::AccountsController < Api::BaseController
 
   def destroy
     authorize @account, :destroy?
-    Admin::AccountDeletionWorker.perform_async(@account.id)
+    Admin::AccountDeletionJob.perform_later(@account.id)
     render_empty
   end
 
@@ -88,7 +88,7 @@ class Api::V1::Admin::AccountsController < Api::BaseController
   def unsuspend
     authorize @account, :unsuspend?
     @account.unsuspend!
-    Admin::UnsuspensionWorker.perform_async(@account.id)
+    Admin::UnsuspensionJob.perform_later(@account.id)
     log_action :unsuspend, @account
     render json: @account, serializer: REST::Admin::AccountSerializer
   end

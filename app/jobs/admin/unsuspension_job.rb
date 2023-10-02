@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-class Admin::UnsuspensionWorker
-  include Sidekiq::Worker
-
-  sidekiq_options queue: 'pull'
+class Admin::UnsuspensionJob < ApplicationJob
+  queue_as :pull
 
   def perform(account_id)
     UnsuspendAccountService.new.call(Account.find(account_id))

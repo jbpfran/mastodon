@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Admin::DomainPurgeWorker do
+RSpec.describe Admin::DomainPurgeJob do
   subject { described_class.new }
 
   describe 'perform' do

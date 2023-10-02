@@ -73,7 +73,7 @@ class ApproveAppealService < BaseService
   def queue_workers!
     case @strike.action
     when 'suspend'
-      Admin::UnsuspensionWorker.perform_async(target_account.id)
+      Admin::UnsuspensionJob.perform_later(target_account.id)
     end
   end
 

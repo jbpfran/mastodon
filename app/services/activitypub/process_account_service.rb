@@ -164,9 +164,9 @@ class ActivityPub::ProcessAccountService < BaseService
 
   def after_suspension_change!
     if @account.suspended?
-      Admin::SuspensionWorker.perform_async(@account.id)
+      Admin::SuspensionJob.perform_later(@account.id)
     else
-      Admin::UnsuspensionWorker.perform_async(@account.id)
+      Admin::UnsuspensionJob.perform_later(@account.id)
     end
   end
 

@@ -47,7 +47,7 @@ RSpec.describe ActivityPub::ProcessAccountService, type: :service do
     end
 
     before do
-      allow(Admin::SuspensionWorker).to receive(:perform_async)
+      allow(Admin::SuspensionJob).to receive(:perform_later)
     end
 
     it 'suspends account remotely' do
@@ -57,7 +57,7 @@ RSpec.describe ActivityPub::ProcessAccountService, type: :service do
 
     it 'queues suspension worker' do
       subject
-      expect(Admin::SuspensionWorker).to have_received(:perform_async)
+      expect(Admin::SuspensionJob).to have_received(:perform_later)
     end
   end
 
@@ -77,7 +77,7 @@ RSpec.describe ActivityPub::ProcessAccountService, type: :service do
     end
 
     before do
-      allow(Admin::UnsuspensionWorker).to receive(:perform_async)
+      allow(Admin::UnsuspensionJob).to receive(:perform_later)
 
       account.suspend!(origin: suspension_origin)
     end

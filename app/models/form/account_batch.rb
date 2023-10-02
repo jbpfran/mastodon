@@ -124,7 +124,7 @@ class Form::AccountBatch
       action: :suspend
     )
 
-    Admin::SuspensionWorker.perform_async(account.id)
+    Admin::SuspensionJob.perform_later(account.id)
 
     # Suspending a single account closes their associated reports, so
     # mass-suspending would be consistent.

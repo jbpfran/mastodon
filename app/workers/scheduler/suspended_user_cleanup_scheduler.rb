@@ -32,7 +32,7 @@ class Scheduler::SuspendedUserCleanupScheduler
     AccountDeletionRequest.reorder(id: :asc).take(MAX_DELETIONS_PER_JOB).each do |deletion_request|
       next unless deletion_request.created_at < AccountDeletionRequest::DELAY_TO_DELETION.ago
 
-      Admin::AccountDeletionWorker.perform_async(deletion_request.account_id)
+      Admin::AccountDeletionJob.perform_later(deletion_request.account_id)
     end
   end
 end

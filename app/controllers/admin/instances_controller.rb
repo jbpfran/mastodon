@@ -17,7 +17,7 @@ module Admin
 
     def destroy
       authorize :instance, :destroy?
-      Admin::DomainPurgeWorker.perform_async(@instance.domain)
+      Admin::DomainPurgeJob.perform_later(@instance.domain)
       log_action :destroy, @instance
       redirect_to admin_instances_path, notice: I18n.t('admin.instances.destroyed_msg', domain: @instance.domain)
     end

@@ -151,7 +151,7 @@ class Admin::AccountAction
   end
 
   def queue_suspension_worker!
-    Admin::SuspensionWorker.perform_async(target_account.id)
+    Admin::SuspensionJob.perform_later(target_account.id)
   end
 
   def process_queue!

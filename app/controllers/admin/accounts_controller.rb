@@ -68,7 +68,7 @@ module Admin
 
     def destroy
       authorize @account, :destroy?
-      Admin::AccountDeletionWorker.perform_async(@account.id)
+      Admin::AccountDeletionJob.perform_later(@account.id)
       redirect_to admin_account_path(@account.id), notice: I18n.t('admin.accounts.destroyed_msg', username: @account.acct)
     end
 
@@ -89,7 +89,7 @@ module Admin
     def unsuspend
       authorize @account, :unsuspend?
       @account.unsuspend!
-      Admin::UnsuspensionWorker.perform_async(@account.id)
+      Admin::UnsuspensionJob.perform_later(@account.id)
       log_action :unsuspend, @account
       redirect_to admin_account_path(@account.id), notice: I18n.t('admin.accounts.unsuspended_msg', username: @account.acct)
     end

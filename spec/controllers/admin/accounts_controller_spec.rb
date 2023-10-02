@@ -412,13 +412,13 @@ RSpec.describe Admin::AccountsController do
       let(:role) { UserRole.find_by(name: 'Admin') }
 
       before do
-        allow(Admin::AccountDeletionWorker).to receive(:perform_async).with(account.id)
+        allow(Admin::AccountDeletionJob).to receive(:perform_later).with(account.id)
       end
 
       it 'destroys the account' do
         subject
 
-        expect(Admin::AccountDeletionWorker).to have_received(:perform_async).with(account.id)
+        expect(Admin::AccountDeletionJob).to have_received(:perform_later).with(account.id)
         expect(response).to redirect_to admin_account_path(account.id)
       end
     end
