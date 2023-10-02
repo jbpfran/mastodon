@@ -208,9 +208,9 @@ gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
 gem 'connection_pool', require: false
 
 ### Background Jobs : Queue Independant Compenents
-gem 'rufus-scheduler' # same job scheduler as in sidekiq-scheduler [https://github.com/jmettraux/rufus-scheduler]
 gem 'activejob-uniqueness' # Unique jobs for ActiveJob. Ensure the uniqueness of jobs in the queue. [https://github.com/veeqo/activejob-uniqueness]
-
+gem 'redis-client'
+gem 'schked' # Framework agnostic scheduler to run recurring jobs. [https://github.com/bibendi/schked
 ### Background Jobs Queue Adapter : Sidekiq
 gem 'sidekiq', '~> 6.5'
 gem 'sidekiq-scheduler', '~> 5.0'
