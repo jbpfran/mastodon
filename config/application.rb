@@ -193,7 +193,7 @@ module Mastodon
     # config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
     # config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
 
-    config.active_job.queue_adapter = :sidekiq
+    config.active_job.queue_adapter = :faktory
 
     config.action_mailer.deliver_later_queue_name = 'mailers'
     config.action_mailer.preview_path = Rails.root.join('spec', 'mailers', 'previews')
