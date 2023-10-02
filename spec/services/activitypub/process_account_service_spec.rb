@@ -103,7 +103,7 @@ RSpec.describe ActivityPub::ProcessAccountService, type: :service do
 
       it 'queues unsuspension worker' do
         subject
-        expect(Admin::UnsuspensionWorker).to have_received(:perform_async)
+        expect(Admin::UnsuspensionJob).to have_received(:perform_later)
       end
 
       it 'updates attributes' do
