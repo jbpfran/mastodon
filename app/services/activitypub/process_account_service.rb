@@ -155,7 +155,7 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   def after_protocol_change!
-    ActivityPub::PostUpgradeWorker.perform_async(@account.domain)
+    ActivityPub::PostUpgradeJob.perform_later(@account.domain)
   end
 
   def after_key_change!
@@ -171,11 +171,11 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   def check_featured_collection!
-    ActivityPub::SynchronizeFeaturedCollectionWorker.perform_async(@account.id, { 'hashtag' => @json['featuredTags'].blank?, 'request_id' => @options[:request_id] })
+    ActivityPub::SynchronizeFeaturedCollectionJob.perform_later(@account.id, { 'hashtag' => @json['featuredTags'].blank?, 'request_id' => @options[:request_id] })
   end
 
   def check_featured_tags_collection!
-    ActivityPub::SynchronizeFeaturedTagsCollectionWorker.perform_async(@account.id, @json['featuredTags'])
+    ActivityPub::SynchronizeFeaturedTagsCollectionJob.perform_later(@account.id, @json['featuredTags'])
   end
 
   def check_links!

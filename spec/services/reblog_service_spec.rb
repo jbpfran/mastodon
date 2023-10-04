@@ -69,7 +69,7 @@ RSpec.describe ReblogService, type: :service do
 
     before do
       stub_request(:post, bob.inbox_url)
-      allow(ActivityPub::DistributionWorker).to receive(:perform_async)
+      allow(ActivityPub::DistributionJob).to receive(:perform_later)
       subject.call(alice, status)
     end
 
@@ -84,7 +84,7 @@ RSpec.describe ReblogService, type: :service do
     end
 
     it 'distributes to followers' do
-      expect(ActivityPub::DistributionWorker).to have_received(:perform_async)
+      expect(ActivityPub::DistributionJob).to have_received(:perform_later)
     end
 
     it 'sends an announce activity to the author' do

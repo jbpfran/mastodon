@@ -12,8 +12,8 @@ class ActivityPub::Forwarder
   end
 
   def forward!
-    ActivityPub::LowPriorityDeliveryWorker.push_bulk(inboxes, limit: 1_000) do |inbox_url|
-      [payload, signature_account_id, inbox_url]
+    inboxes.in_batches.each do |inbox_url|
+      ActivityPub::LowPriorityDeliveryJob.perform_later(payload, signature_account_id, inbox_url)
     end
   end
 

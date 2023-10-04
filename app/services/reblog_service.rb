@@ -30,7 +30,7 @@ class ReblogService < BaseService
 
     Trends.register!(reblog)
     DistributionWorker.perform_async(reblog.id)
-    ActivityPub::DistributionWorker.perform_async(reblog.id)
+    ActivityPub::DistributionJob.perform_later(reblog.id)
 
     create_notification(reblog)
     bump_potential_friendship(account, reblog)
@@ -46,7 +46,7 @@ class ReblogService < BaseService
     if reblogged_status.account.local?
       LocalNotificationJob.perform_later(reblogged_status.account_id, reblog.id, reblog.class.name, 'reblog')
     elsif reblogged_status.account.activitypub? && !reblogged_status.account.following?(reblog.account)
-      ActivityPub::DeliveryWorker.perform_async(build_json(reblog), reblog.account_id, reblogged_status.account.inbox_url)
+      ActivityPub::DeliveryJob.perform_later(build_json(reblog), reblog.account_id, reblogged_status.account.inbox_url)
     end
   end
 

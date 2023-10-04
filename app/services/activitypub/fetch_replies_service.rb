@@ -10,7 +10,9 @@ class ActivityPub::FetchRepliesService < BaseService
     @items = collection_items(collection_or_uri)
     return if @items.nil?
 
-    FetchReplyWorker.push_bulk(filtered_replies) { |reply_uri| [reply_uri, { 'request_id' => request_id }] }
+    filtered_replies.each do |reply_uri|
+      FetchReplyJob.perform_later(reply_uri, { 'request_id' => request_id })
+    end
 
     @items
   end

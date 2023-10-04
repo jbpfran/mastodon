@@ -36,7 +36,7 @@ class PollExpirationNotifyJob < ApplicationJob
   end
 
   def notify_remote_voters_and_owner!
-    ActivityPub::DistributePollUpdateWorker.perform_async(@poll.status.id)
+    ActivityPub::DistributePollUpdateJob.perform_later(@poll.status.id)
     LocalNotificationJob.perform_later(@poll.account_id, @poll.id, 'Poll', 'poll')
   end
 

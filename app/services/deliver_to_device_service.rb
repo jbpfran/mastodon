@@ -47,7 +47,7 @@ class DeliverToDeviceService < BaseService
   end
 
   def deliver_to_remote!
-    ActivityPub::DeliveryWorker.perform_async(
+    ActivityPub::DeliveryJob.perform_later(
       Oj.dump(serialize_payload(ActivityPub::ActivityPresenter.from_encrypted_message(encrypted_message), ActivityPub::ActivitySerializer)),
       @source_account.id,
       @target_account.inbox_url

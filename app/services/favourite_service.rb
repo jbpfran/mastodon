@@ -33,7 +33,7 @@ class FavouriteService < BaseService
     if status.account.local?
       LocalNotificationJob.perform_later(status.account_id, favourite.id, 'Favourite', 'favourite')
     elsif status.account.activitypub?
-      ActivityPub::DeliveryWorker.perform_async(build_json(favourite), favourite.account_id, status.account.inbox_url)
+      ActivityPub::DeliveryJob.perform_later(build_json(favourite), favourite.account_id, status.account.inbox_url)
     end
   end
 

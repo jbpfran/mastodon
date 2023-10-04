@@ -950,11 +950,11 @@ describe Mastodon::CLI::Accounts do
       end
 
       it 'broadcasts the new keys for the specified account' do
-        allow(ActivityPub::UpdateDistributionWorker).to receive(:perform_in)
+        allow(ActivityPub::UpdateDistributionJob).to receive(:perform_later)
 
         cli.rotate(account.username)
 
-        expect(ActivityPub::UpdateDistributionWorker).to have_received(:perform_in).with(anything, account.id, anything).once
+        expect(ActivityPub::UpdateDistributionJob).to have_received(:perform_later).with(anything, account.id, anything).once
       end
 
       context 'when the given username is not found' do
@@ -988,12 +988,12 @@ describe Mastodon::CLI::Accounts do
       end
 
       it 'broadcasts the new keys for each account' do
-        allow(ActivityPub::UpdateDistributionWorker).to receive(:perform_in)
+        allow(ActivityPub::UpdateDistributionJob).to receive(:perform_later)
 
         cli.rotate
 
         accounts.each do |account|
-          expect(ActivityPub::UpdateDistributionWorker).to have_received(:perform_in).with(anything, account.id, anything).once
+          expect(ActivityPub::UpdateDistributionJob).to have_received(:perform_later).with(anything, account.id, anything).once
         end
       end
     end

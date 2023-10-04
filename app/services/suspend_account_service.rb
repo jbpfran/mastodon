@@ -32,8 +32,8 @@ class SuspendAccountService < BaseService
     # account to re-follow you, so this part is not reversible.
 
     Follow.where(account: @account).find_in_batches do |follows|
-      ActivityPub::DeliveryWorker.push_bulk(follows) do |follow|
-        [Oj.dump(serialize_payload(follow, ActivityPub::RejectFollowSerializer)), follow.target_account_id, @account.inbox_url]
+      follows.each do |follow|
+        ActivityPub::DeliveryJob.perform_later(Oj.dump(serialize_payload(follow, ActivityPub::RejectFollowSerializer)), follow.target_account_id, @account.inbox_url)
       end
 
       follows.each(&:destroy)
@@ -45,8 +45,8 @@ class SuspendAccountService < BaseService
 
     account_reach_finder = AccountReachFinder.new(@account)
 
-    ActivityPub::DeliveryWorker.push_bulk(account_reach_finder.inboxes, limit: 1_000) do |inbox_url|
-      [signed_activity_json, @account.id, inbox_url]
+    account_reach_finder.inboxes.each do |inbox_url|
+      ActivityPub::DeliveryJob.perform_later(Oj.dump(signed_activity_json, @account.id, inbox_url))
     end
   end
 
@@ -95,7 +95,7 @@ class SuspendAccountService < BaseService
             end
           end
 
-          CacheBusterWorker.perform_async(attachment.path(style)) if Rails.configuration.x.cache_buster_enabled
+          CacheBusterJob.perform_later(attachment.path(style)) if Rails.configuration.x.cache_buster_enabled
         end
       end
     end

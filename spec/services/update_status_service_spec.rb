@@ -9,7 +9,7 @@ RSpec.describe UpdateStatusService, type: :service do
     let!(:status) { Fabricate(:status, text: 'Foo', language: 'en') }
 
     before do
-      allow(ActivityPub::DistributionWorker).to receive(:perform_async)
+      allow(ActivityPub::DistributionJob).to receive(:perform_later)
       subject.call(status, status.account_id, text: 'Foo')
     end
 
@@ -18,7 +18,7 @@ RSpec.describe UpdateStatusService, type: :service do
     end
 
     it 'does not notify anyone' do
-      expect(ActivityPub::DistributionWorker).to_not have_received(:perform_async)
+      expect(ActivityPub::DistributionJob).to_not have_received(:perform_later)
     end
   end
 
@@ -182,8 +182,8 @@ RSpec.describe UpdateStatusService, type: :service do
 
   it 'notifies ActivityPub about the update' do
     status = Fabricate(:status, text: 'Foo')
-    allow(ActivityPub::DistributionWorker).to receive(:perform_async)
+    allow(ActivityPub::DistributionJob).to receive(:perform_later)
     subject.call(status, status.account_id, text: 'Bar')
-    expect(ActivityPub::DistributionWorker).to have_received(:perform_async)
+    expect(ActivityPub::DistributionJob).to have_received(:perform_later)
   end
 end

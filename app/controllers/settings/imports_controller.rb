@@ -64,7 +64,7 @@ class Settings::ImportsController < Settings::BaseController
 
   def confirm
     @bulk_import.update!(state: :scheduled)
-    BulkImportWorker.perform_async(@bulk_import.id)
+    BulkImportJob.perform_later(@bulk_import.id)
     redirect_to settings_imports_path, notice: I18n.t('imports.success')
   end
 

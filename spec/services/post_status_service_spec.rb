@@ -176,14 +176,14 @@ RSpec.describe PostStatusService, type: :service do
 
   it 'gets distributed' do
     allow(DistributionWorker).to receive(:perform_async)
-    allow(ActivityPub::DistributionWorker).to receive(:perform_async)
+    allow(ActivityPub::DistributionJob).to receive(:perform_later)
 
     account = Fabricate(:account)
 
     status = subject.call(account, text: 'test status update')
 
     expect(DistributionWorker).to have_received(:perform_async).with(status.id)
-    expect(ActivityPub::DistributionWorker).to have_received(:perform_async).with(status.id)
+    expect(ActivityPub::DistributionJob).to have_received(:perform_later).with(status.id)
   end
 
   it 'crawls links' do

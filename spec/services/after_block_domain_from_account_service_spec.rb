@@ -10,7 +10,7 @@ RSpec.describe AfterBlockDomainFromAccountService, type: :service do
 
   before do
     stub_jsonld_contexts!
-    allow(ActivityPub::DeliveryWorker).to receive(:perform_async)
+    allow(ActivityPub::DeliveryJob).to receive(:perform_later)
   end
 
   it 'purge followers from blocked domain' do
@@ -22,6 +22,6 @@ RSpec.describe AfterBlockDomainFromAccountService, type: :service do
   it 'sends Reject->Follow to followers from blocked domain' do
     wolf.follow!(alice)
     subject.call(alice, 'evil.org')
-    expect(ActivityPub::DeliveryWorker).to have_received(:perform_async).once
+    expect(ActivityPub::DeliveryJob).to have_received(:perform_later).once
   end
 end

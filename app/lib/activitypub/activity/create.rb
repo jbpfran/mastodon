@@ -319,7 +319,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     end
 
     increment_voters_count! unless already_voted
-    ActivityPub::DistributePollUpdateWorker.perform_in(3.minutes, replied_to_status.id) unless replied_to_status.preloadable_poll.hide_totals?
+    ActivityPub::DistributePollUpdateJob.set(wait: 3.minutes).perform_later(replied_to_status.id) unless replied_to_status.preloadable_poll.hide_totals?
   end
 
   def resolve_thread(status)
@@ -336,7 +336,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
     return unless replies.nil?
 
     uri = value_or_id(collection)
-    ActivityPub::FetchRepliesWorker.perform_async(status.id, uri, { 'request_id' => @options[:request_id] }) unless uri.nil?
+    ActivityPub::FetchRepliesJob.perform_later(status.id, uri, { 'request_id' => @options[:request_id] }) unless uri.nil?
   end
 
   def conversation_from_uri(uri)
@@ -410,7 +410,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def forward_for_reply
     return unless @status.distributable? && @json['signature'].present? && reply_to_local?
 
-    ActivityPub::RawDistributionWorker.perform_async(Oj.dump(@json), replied_to_status.account_id, [@account.preferred_inbox_url])
+    ActivityPub::RawDistributionJob.perform_later(Oj.dump(@json), replied_to_status.account_id, [@account.preferred_inbox_url])
   end
 
   def increment_voters_count!

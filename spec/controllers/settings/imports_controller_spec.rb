@@ -66,7 +66,7 @@ RSpec.describe Settings::ImportsController do
     subject { post :confirm, params: { id: bulk_import.id } }
 
     before do
-      allow(BulkImportWorker).to receive(:perform_async)
+      allow(BulkImportJob).to receive(:perform_later)
     end
 
     context 'with someone else\'s import' do
@@ -78,7 +78,7 @@ RSpec.describe Settings::ImportsController do
 
       it 'does not fire the import worker' do
         subject
-        expect(BulkImportWorker).to_not have_received(:perform_async)
+        expect(BulkImportJob).to_not have_received(:perform_later)
       end
 
       it 'returns http not found' do
@@ -96,7 +96,7 @@ RSpec.describe Settings::ImportsController do
 
       it 'does not fire the import worker' do
         subject
-        expect(BulkImportWorker).to_not have_received(:perform_async)
+        expect(BulkImportJob).to_not have_received(:perform_later)
       end
 
       it 'returns http not found' do
@@ -114,7 +114,7 @@ RSpec.describe Settings::ImportsController do
 
       it 'fires the import worker on the expected import' do
         subject
-        expect(BulkImportWorker).to have_received(:perform_async).with(bulk_import.id)
+        expect(BulkImportJob).to have_received(:perform_later).with(bulk_import.id)
       end
 
       it 'redirects to imports path' do

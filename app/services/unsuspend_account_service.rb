@@ -41,8 +41,8 @@ class UnsuspendAccountService < BaseService
 
     account_reach_finder = AccountReachFinder.new(@account)
 
-    ActivityPub::DeliveryWorker.push_bulk(account_reach_finder.inboxes, limit: 1_000) do |inbox_url|
-      [signed_activity_json, @account.id, inbox_url]
+    account_reach_finder.inboxes.each do |inbox_url|
+      ActivityPub::DeliveryJob.perform_later(signed_activity_json, @account.id, inbox_url)
     end
   end
 
@@ -91,7 +91,7 @@ class UnsuspendAccountService < BaseService
             end
           end
 
-          CacheBusterWorker.perform_async(attachment.path(style)) if Rails.configuration.x.cache_buster_enabled
+          CacheBusterJob.perform_later(attachment.path(style)) if Rails.configuration.x.cache_buster_enabled
         end
       end
     end

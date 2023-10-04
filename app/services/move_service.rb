@@ -23,10 +23,10 @@ class MoveService < BaseService
   end
 
   def distribute_update!
-    ActivityPub::UpdateDistributionWorker.perform_async(@source_account.id)
+    ActivityPub::UpdateDistributionJob.perform_later(@source_account.id)
   end
 
   def distribute_move!
-    ActivityPub::MoveDistributionWorker.perform_async(@migration.id)
+    ActivityPub::MoveDistributionJob.perform_later(@migration.id)
   end
 end

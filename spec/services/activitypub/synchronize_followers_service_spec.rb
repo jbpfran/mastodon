@@ -35,7 +35,7 @@ RSpec.describe ActivityPub::SynchronizeFollowersService, type: :service do
       bob.follow!(actor)
       mallory.request_follow!(actor)
 
-      allow(ActivityPub::DeliveryWorker).to receive(:perform_async)
+      allow(ActivityPub::DeliveryJob).to receive(:perform_later)
 
       subject.call(actor, collection_uri)
     end
@@ -53,7 +53,7 @@ RSpec.describe ActivityPub::SynchronizeFollowersService, type: :service do
     end
 
     it 'sends an Undo Follow to the actor' do
-      expect(ActivityPub::DeliveryWorker).to have_received(:perform_async).with(anything, eve.id, actor.inbox_url)
+      expect(ActivityPub::DeliveryJob).to have_received(:perform_later).with(anything, eve.id, actor.inbox_url)
     end
   end
 

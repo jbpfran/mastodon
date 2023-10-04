@@ -7,7 +7,7 @@ class RemoveFeaturedTagService < BaseService
     @account = account
 
     featured_tag.destroy!
-    ActivityPub::AccountRawDistributionWorker.perform_async(build_json(featured_tag), account.id) if @account.local?
+    ActivityPub::AccountRawDistributionJob.perform_later(build_json(featured_tag), account.id) if @account.local?
   end
 
   private

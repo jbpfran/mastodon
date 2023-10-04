@@ -110,8 +110,8 @@ class DeleteAccountService < BaseService
     # to access toots it would receive because it follows local accounts,
     # we have to force it to unfollow them.
 
-    ActivityPub::DeliveryWorker.push_bulk(Follow.where(account: @account)) do |follow|
-      [Oj.dump(serialize_payload(follow, ActivityPub::RejectFollowSerializer)), follow.target_account_id, @account.inbox_url]
+    Follow.where(account: @account).each do |follow|
+      ActivityPub::DeliveryJob.perform_later(Oj.dump(serialize_payload(follow, ActivityPub::RejectFollowSerializer)), follow.target_account_id, @account.inbox_url)
     end
   end
 
@@ -122,8 +122,8 @@ class DeleteAccountService < BaseService
     # follow relationships are severed to avoid confusion and potential issues
     # if the remote account gets un-suspended.
 
-    ActivityPub::DeliveryWorker.push_bulk(Follow.where(target_account: @account)) do |follow|
-      [Oj.dump(serialize_payload(follow, ActivityPub::UndoFollowSerializer)), follow.account_id, @account.inbox_url]
+    Follow.where(target_account: @account).each do |follow|
+      ActivityPub::DeliveryJob.perform_later(Oj.dump(serialize_payload(follow, ActivityPub::UndoFollowSerializer)), follow.account_id, @account.inbox_url)
     end
   end
 
@@ -257,12 +257,12 @@ class DeleteAccountService < BaseService
   end
 
   def delete_actor!
-    ActivityPub::DeliveryWorker.push_bulk(delivery_inboxes, limit: 1_000) do |inbox_url|
-      [delete_actor_json, @account.id, inbox_url]
+    delivery_inboxes.each do |inbox_url|
+      ActivityPub::DeliveryJob.perform_later(delete_actor_json, @account.id, inbox_url)
     end
 
-    ActivityPub::LowPriorityDeliveryWorker.push_bulk(low_priority_delivery_inboxes, limit: 1_000) do |inbox_url|
-      [delete_actor_json, @account.id, inbox_url]
+    low_priority_delivery_inboxes.each do |inbox_url|
+      ActivityPub::DeliveryJob.perform_later(delete_actor_json, @account.id, inbox_url)
     end
   end
 

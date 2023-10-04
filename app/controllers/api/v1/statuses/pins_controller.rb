@@ -37,7 +37,7 @@ class Api::V1::Statuses::PinsController < Api::BaseController
       adapter: ActivityPub::Adapter
     ).as_json
 
-    ActivityPub::RawDistributionWorker.perform_async(Oj.dump(json), current_account.id)
+    ActivityPub::RawDistributionJob.perform_later(Oj.dump(json), current_account.id)
   end
 
   def distribute_remove_activity!
@@ -47,6 +47,6 @@ class Api::V1::Statuses::PinsController < Api::BaseController
       adapter: ActivityPub::Adapter
     ).as_json
 
-    ActivityPub::RawDistributionWorker.perform_async(Oj.dump(json), current_account.id)
+    ActivityPub::RawDistributionJob.perform_later(Oj.dump(json), current_account.id)
   end
 end

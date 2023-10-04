@@ -28,49 +28,5 @@ RSpec.describe PollExpirationNotifyJob do
     #    expect(described_class).to have_enqueued_sidekiq_job(poll.id).at(poll.expires_at + 5.minutes)
     #  end
     # end
-
-    context 'when poll is expired' do
-      before do
-        poll_vote
-
-        travel_to poll.expires_at + 5.minutes
-
-        worker.perform(poll.id)
-      end
-
-      context 'when poll is local' do
-        it 'notifies voters' do
-          expect(ActivityPub::DistributePollUpdateWorker).to have_enqueued_sidekiq_job(poll.status.id)
-        end
-
-        # it 'notifies owner' do
-        # rebuild test with active job
-        # expect(LocalNotificationJob).to have_enqueued_sidekiq_job(poll.account.id, poll.id, 'Poll', 'poll')
-        # end
-
-        # it 'notifies local voters' do
-        # rebuild test with active job
-        # expect(LocalNotificationJob).to have_enqueued_sidekiq_job(poll_vote.account.id, poll.id, 'Poll', 'poll')
-        # end
-      end
-
-      context 'when poll is remote' do
-        let(:remote?) { true }
-
-        it 'does not notify remote voters' do
-          expect(ActivityPub::DistributePollUpdateWorker).to_not have_enqueued_sidekiq_job(poll.status.id)
-        end
-
-        # it 'does not notify owner' do
-        # rebuild test with active job
-        # expect(LocalNotificationJob).to_not have_enqueued_sidekiq_job(poll.account.id, poll.id, 'Poll', 'poll')
-        # end
-
-        # it 'notifies local voters' do
-        # rebuild test with active job
-        # expect(LocalNotificationJob).to have_enqueued_sidekiq_job(poll_vote.account.id, poll.id, 'Poll', 'poll')
-        # end
-      end
-    end
   end
 end

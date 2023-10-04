@@ -45,6 +45,6 @@ class AfterBlockDomainFromAccountService < BaseService
 
     return unless follow.account.activitypub?
 
-    ActivityPub::DeliveryWorker.perform_async(Oj.dump(serialize_payload(follow, ActivityPub::RejectFollowSerializer)), @account.id, follow.account.inbox_url)
+    ActivityPub::DeliveryJob.perform_later(Oj.dump(serialize_payload(follow, ActivityPub::RejectFollowSerializer)), @account.id, follow.account.inbox_url)
   end
 end

@@ -126,8 +126,8 @@ module Mastodon::CLI
         json = Oj.dump(ActivityPub::LinkedDataSignature.new(payload).sign!(account))
 
         unless dry_run?
-          ActivityPub::DeliveryWorker.push_bulk(inboxes, limit: 1_000) do |inbox_url|
-            [json, account.id, inbox_url]
+          inboxes.in_batches.each do |inbox_url|
+            ActivityPub::DeliveryJob.perform_later(json, account.id, inbox_url)
           end
 
           account.suspend!(block_email: false)

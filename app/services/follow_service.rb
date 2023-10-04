@@ -71,7 +71,7 @@ class FollowService < BaseService
     if @target_account.local?
       LocalNotificationJob.perform_later(@target_account.id, follow_request.id, follow_request.class.name, 'follow_request')
     elsif @target_account.activitypub?
-      ActivityPub::DeliveryWorker.perform_async(build_json(follow_request), @source_account.id, @target_account.inbox_url)
+      ActivityPub::DeliveryJob.perform_later(build_json(follow_request), @source_account.id, @target_account.inbox_url)
     end
 
     follow_request

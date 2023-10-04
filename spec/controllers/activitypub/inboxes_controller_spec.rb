@@ -57,7 +57,7 @@ RSpec.describe ActivityPub::InboxesController do
       let(:synchronization_header)     { "collectionId=\"#{synchronization_collection}\", digest=\"#{synchronization_hash}\", url=\"#{synchronization_url}\"" }
 
       before do
-        allow(ActivityPub::FollowersSynchronizationWorker).to receive(:perform_async).and_return(nil)
+        allow(ActivityPub::FollowersSynchronizationJob).to receive(:perform_later).and_return(nil)
         allow_any_instance_of(Account).to receive(:local_followers_hash).and_return('somehash')
 
         request.headers['Collection-Synchronization'] = synchronization_header
@@ -68,7 +68,7 @@ RSpec.describe ActivityPub::InboxesController do
         let(:synchronization_collection) { 'https://example.com/followers2' }
 
         it 'does not start a synchronization job' do
-          expect(ActivityPub::FollowersSynchronizationWorker).to_not have_received(:perform_async)
+          expect(ActivityPub::FollowersSynchronizationJob).to_not have_received(:perform_later)
         end
       end
 
@@ -76,13 +76,13 @@ RSpec.describe ActivityPub::InboxesController do
         let(:synchronization_url) { 'https://example.org/followers' }
 
         it 'does not start a synchronization job' do
-          expect(ActivityPub::FollowersSynchronizationWorker).to_not have_received(:perform_async)
+          expect(ActivityPub::FollowersSynchronizationJob).to_not have_received(:perform_later)
         end
       end
 
       context 'with matching digest' do
         it 'does not start a synchronization job' do
-          expect(ActivityPub::FollowersSynchronizationWorker).to_not have_received(:perform_async)
+          expect(ActivityPub::FollowersSynchronizationJob).to_not have_received(:perform_later)
         end
       end
 
@@ -90,7 +90,7 @@ RSpec.describe ActivityPub::InboxesController do
         let(:synchronization_hash) { 'wronghash' }
 
         it 'starts a synchronization job' do
-          expect(ActivityPub::FollowersSynchronizationWorker).to have_received(:perform_async)
+          expect(ActivityPub::FollowersSynchronizationJob).to_not have_received(:perform_later)
         end
       end
 

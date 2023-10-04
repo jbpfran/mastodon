@@ -8,6 +8,6 @@ class ActivityPub::PrepareFollowersSynchronizationService < BaseService
 
     return if params['collectionId'] != @account.followers_url || non_matching_uri_hosts?(@account.uri, params['url']) || @account.local_followers_hash == params['digest']
 
-    ActivityPub::FollowersSynchronizationWorker.perform_async(@account.id, params['url'])
+    ActivityPub::FollowersSynchronizationJob.perform_later(@account.id, params['url'])
   end
 end
