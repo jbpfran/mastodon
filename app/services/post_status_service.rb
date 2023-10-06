@@ -118,8 +118,8 @@ class PostStatusService < BaseService
   def postprocess_status!
     process_hashtags_service.call(@status)
     Trends.tags.register(@status)
-    LinkCrawlWorker.perform_async(@status.id)
-    DistributionWorker.perform_async(@status.id)
+    LinkCrawlJob.perform_later(@status.id)
+    DistributionJob.perform_later(@status.id)
     ActivityPub::DistributionJob.perform_later(@status.id)
     PollExpirationNotifyJob.set(wait_until: @status.poll.expires_at).perform_later(@status.poll.id) if @status.poll
   end

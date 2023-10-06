@@ -379,7 +379,7 @@ RSpec.describe ActivityPub::ProcessStatusUpdateService, type: :service do
       end
 
       before do
-        allow(RedownloadMediaWorker).to receive(:perform_async)
+        allow(RedownloadMediaJob).to receive(:perform_later)
         subject.call(status, json)
       end
 
@@ -392,7 +392,7 @@ RSpec.describe ActivityPub::ProcessStatusUpdateService, type: :service do
       end
 
       it 'does not queue redownload for the existing media attachment' do
-        expect(RedownloadMediaWorker).to_not have_received(:perform_async)
+        expect(RedownloadMediaJob).to_not have_received(:perform_later)
       end
 
       it 'updates media attachments' do

@@ -96,7 +96,7 @@ RSpec.describe 'Favourites' do
         expect(response).to have_http_status(200)
         expect(user.account.favourited?(status)).to be true
 
-        UnfavouriteWorker.drain
+        UnfavouriteJob.drain
         expect(user.account.favourited?(status)).to be false
       end
 
@@ -121,7 +121,7 @@ RSpec.describe 'Favourites' do
         expect(response).to have_http_status(200)
         expect(user.account.favourited?(status)).to be true
 
-        UnfavouriteWorker.drain
+        UnfavouriteJob.drain
         expect(user.account.favourited?(status)).to be false
       end
 

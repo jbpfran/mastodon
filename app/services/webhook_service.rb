@@ -6,7 +6,7 @@ class WebhookService < BaseService
     @body   = serialize_event
 
     webhooks_for_event.each do |webhook_id|
-      Webhooks::DeliveryWorker.perform_async(webhook_id, @body)
+      Webhooks::DeliveryJob.perform_later(webhook_id, @body)
     end
   end
 

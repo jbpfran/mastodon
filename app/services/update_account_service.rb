@@ -25,13 +25,10 @@ class UpdateAccountService < BaseService
     follow_requests.each do |req|
       AuthorizeFollowJob.perform_later(req.account_id, req.target_account_id)
     end
-    # AuthorizeFollowWorker.push_bulk(follow_requests, limit: 1_000) do |req|
-    #  [req.account_id, req.target_account_id]
-    # end
   end
 
   def check_links(account)
-    VerifyAccountLinksWorker.perform_async(account.id) if account.fields.any?(&:requires_verification?)
+    VerifyAccountLinksJob.perform_later(account.id) if account.fields.any?(&:requires_verification?)
   end
 
   def process_hashtags(account)

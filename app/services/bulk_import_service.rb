@@ -58,8 +58,8 @@ class BulkImportService < BaseService
       @import.save!
     end
 
-    Import::RowWorker.push_bulk(rows_by_acct.values) do |row|
-      [row.id]
+    rows_by_acct.each_value do |row|
+      Import::RowJob.perform_later(row.id)
     end
   end
 
@@ -84,8 +84,8 @@ class BulkImportService < BaseService
       @import.save!
     end
 
-    Import::RowWorker.push_bulk(rows_by_acct.values) do |row|
-      [row.id]
+    rows_by_acct.each_value do |row|
+      Import::RowJob.perform_later(row.id)
     end
   end
 
@@ -110,8 +110,8 @@ class BulkImportService < BaseService
       @import.save!
     end
 
-    Import::RowWorker.push_bulk(rows_by_acct.values) do |row|
-      [row.id]
+    rows_by_acct.each_value do |row|
+      Import::RowJob.perform_later(row.id)
     end
   end
 
@@ -133,9 +133,6 @@ class BulkImportService < BaseService
     domains.each do |domain|
       AfterAccountDomainBlockJob.perform_later(@account.id, domain)
     end
-    # AfterAccountDomainBlockWorker.push_bulk(domains) do |domain|
-    #  [@account.id, domain]
-    # end
   end
 
   def import_bookmarks!
@@ -158,8 +155,8 @@ class BulkImportService < BaseService
       @import.save!
     end
 
-    Import::RowWorker.push_bulk(rows_by_uri.values) do |row|
-      [row.id]
+    rows_by_uri.each_value do |row|
+      Import::RowJob.perform_later(row.id)
     end
   end
 
@@ -181,8 +178,8 @@ class BulkImportService < BaseService
       @account.owned_lists.find_or_create_by!(title: title)
     end
 
-    Import::RowWorker.push_bulk(rows) do |row|
-      [row.id]
+    rows.each do |row|
+      Import::RowJob.perform_later(row.id)
     end
   end
 end

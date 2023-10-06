@@ -18,7 +18,7 @@ class ActivityPub::Activity::Move < ActivityPub::Activity
     origin_account.update(moved_to_account: target_account)
 
     # Initiate a re-follow for each follower
-    MoveWorker.perform_async(origin_account.id, target_account.id)
+    MoveJob.perform_later(origin_account.id, target_account.id)
   rescue
     unmark_as_processing!
     raise

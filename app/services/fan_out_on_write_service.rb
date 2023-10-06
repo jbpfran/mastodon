@@ -83,32 +83,32 @@ class FanOutOnWriteService < BaseService
 
   def deliver_to_all_followers!
     @account.followers_for_local_distribution.select(:id).reorder(nil).find_in_batches do |followers|
-      FeedInsertWorker.push_bulk(followers) do |follower|
-        [@status.id, follower.id, 'home', { 'update' => update? }]
+      followers.each do |follower|
+        FeedInsertJob.perform_later(@status.id, follower.id, 'home', { 'update' => update? })
       end
     end
   end
 
   def deliver_to_hashtag_followers!
     TagFollow.where(tag_id: @status.tags.map(&:id)).select(:id, :account_id).reorder(nil).find_in_batches do |follows|
-      FeedInsertWorker.push_bulk(follows) do |follow|
-        [@status.id, follow.account_id, 'tags', { 'update' => update? }]
+      follows.each do |follow|
+        FeedInsertJob.perform_later(@status.id, follow.account_id, 'tags', { 'update' => update? })
       end
     end
   end
 
   def deliver_to_lists!
     @account.lists_for_local_distribution.select(:id).reorder(nil).find_in_batches do |lists|
-      FeedInsertWorker.push_bulk(lists) do |list|
-        [@status.id, list.id, 'list', { 'update' => update? }]
+      lists.each do |list|
+        FeedInsertJob.perform_later(@status.id, list.id, 'list', { 'update' => update? })
       end
     end
   end
 
   def deliver_to_mentioned_followers!
     @status.mentions.joins(:account).merge(@account.followers_for_local_distribution).select(:id, :account_id).reorder(nil).find_in_batches do |mentions|
-      FeedInsertWorker.push_bulk(mentions) do |mention|
-        [@status.id, mention.account_id, 'home', { 'update' => update? }]
+      mentions.each do |mention|
+        FeedInsertJob.perform_later(@status.id, mention.account_id, 'home', { 'update' => update? })
       end
     end
   end

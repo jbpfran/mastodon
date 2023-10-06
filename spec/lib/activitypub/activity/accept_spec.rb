@@ -25,7 +25,7 @@ RSpec.describe ActivityPub::Activity::Accept do
     subject { described_class.new(json, sender) }
 
     before do
-      allow(RemoteAccountRefreshWorker).to receive(:perform_async)
+      allow(RemoteAccountRefreshJob).to receive(:perform_later)
       Fabricate(:follow_request, account: recipient, target_account: sender)
       subject.perform
     end
@@ -39,7 +39,7 @@ RSpec.describe ActivityPub::Activity::Accept do
     end
 
     it 'queues a refresh' do
-      expect(RemoteAccountRefreshWorker).to have_received(:perform_async).with(sender.id)
+      expect(RemoteAccountRefreshJob).to have_received(:perform_later).with(sender.id)
     end
   end
 

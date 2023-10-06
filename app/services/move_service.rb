@@ -19,7 +19,7 @@ class MoveService < BaseService
   end
 
   def process_local_relationships!
-    MoveWorker.perform_async(@source_account.id, @target_account.id)
+    MoveJob.perform_later(@source_account.id, @target_account.id)
   end
 
   def distribute_update!

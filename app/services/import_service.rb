@@ -63,10 +63,6 @@ class ImportService < BaseService
       @account.block_domain!(domain)
       AfterAccountDomainBlockJob.perform_later(@account.id, domain)
     end
-
-    # AfterAccountDomainBlockWorker.push_bulk(items) do |domain|
-    #  [@account.id, domain]
-    # end
   end
 
   def import_relationships!(action, undo_action, overwrite_scope, limit, extra_fields = {})
@@ -80,9 +76,9 @@ class ImportService < BaseService
         if presence_hash[target_account.acct]
           items.delete(target_account.acct)
           extra = presence_hash[target_account.acct][1]
-          Import::RelationshipWorker.perform_async(@account.id, target_account.acct, action, extra.stringify_keys)
+          Import::RelationshipJob.perform_later(@account.id, target_account.acct, action, extra.stringify_keys)
         else
-          Import::RelationshipWorker.perform_async(@account.id, target_account.acct, undo_action)
+          Import::RelationshipJob.perform_later(@account.id, target_account.acct, undo_action)
         end
       end
     end
@@ -90,8 +86,8 @@ class ImportService < BaseService
     head_items = items.uniq { |acct, _| acct.split('@')[1] }
     tail_items = items - head_items
 
-    Import::RelationshipWorker.push_bulk(head_items + tail_items) do |acct, extra|
-      [@account.id, acct, action, extra.stringify_keys]
+    (head_items + tail_items).each do |acct, extra|
+      Import::RelationshipJob.perform_later(@account.id, acct, action, extra.stringify_keys)
     end
   end
 

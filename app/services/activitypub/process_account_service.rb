@@ -127,13 +127,13 @@ class ActivityPub::ProcessAccountService < BaseService
       @account.avatar_remote_url = image_url('icon') || '' unless skip_download?
       @account.avatar = nil if @account.avatar_remote_url.blank?
     rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
-      RedownloadAvatarWorker.perform_in(rand(30..600).seconds, @account.id)
+      RedownloadAvatarJob.set(wait: rand(30..600).seconds).perform_later(@account.id)
     end
     begin
       @account.header_remote_url = image_url('image') || '' unless skip_download?
       @account.header = nil if @account.header_remote_url.blank?
     rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
-      RedownloadHeaderWorker.perform_in(rand(30..600).seconds, @account.id)
+      RedownloadHeaderJob.set(wait: rand(30..600).seconds).perform_later(@account.id)
     end
     @account.statuses_count    = outbox_total_items    if outbox_total_items.present?
     @account.following_count   = following_total_items if following_total_items.present?
@@ -159,7 +159,7 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   def after_key_change!
-    RefollowWorker.perform_async(@account.id)
+    RefollowJob.perform_later(@account.id)
   end
 
   def after_suspension_change!
@@ -179,7 +179,7 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   def check_links!
-    VerifyAccountLinksWorker.perform_async(@account.id)
+    VerifyAccountLinksJob.perform_later(@account.id)
   end
 
   def process_duplicate_accounts!

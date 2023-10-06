@@ -93,10 +93,10 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
   def distribute
     # Spread out crawling randomly to avoid DDoSing the link
-    LinkCrawlWorker.perform_in(rand(1..59).seconds, @status.id)
+    LinkCrawlJob.set(wait: rand(1..59).seconds).perform_later(@status.id)
 
     # Distribute into home and list feeds and notify mentioned accounts
-    ::DistributionWorker.perform_async(@status.id, { 'silenced_account_ids' => @silenced_account_ids }) if @options[:override_timestamps] || @status.within_realtime_window?
+    ::DistributionJob.perform_later(@status.id, { 'silenced_account_ids' => @silenced_account_ids }) if @options[:override_timestamps] || @status.within_realtime_window?
   end
 
   def find_existing_status
@@ -168,7 +168,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
     return unless delivered_to_account.following?(@account)
 
-    FeedInsertWorker.perform_async(@status.id, delivered_to_account.id, 'home')
+    FeedInsertJob.perform_later(@status.id, delivered_to_account.id, 'home')
   end
 
   def delivered_to_account
@@ -275,7 +275,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
         media_attachment.download_thumbnail!
         media_attachment.save
       rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
-        RedownloadMediaWorker.perform_in(rand(30..600).seconds, media_attachment.id)
+        RedownloadMediaJob.set(wait: rand(30..600).seconds).perform_later(media_attachment.id)
       rescue Seahorse::Client::NetworkingError => e
         Rails.logger.warn "Error storing media attachment: #{e}"
       end
@@ -325,7 +325,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
   def resolve_thread(status)
     return unless status.reply? && status.thread.nil? && Request.valid_url?(in_reply_to_uri)
 
-    ThreadResolveWorker.perform_async(status.id, in_reply_to_uri, { 'request_id' => @options[:request_id] })
+    ThreadResolveJob.perform_later(status.id, in_reply_to_uri, { 'request_id' => @options[:request_id] })
   end
 
   def fetch_replies(status)

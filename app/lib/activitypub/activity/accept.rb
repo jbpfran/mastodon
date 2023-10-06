@@ -28,7 +28,7 @@ class ActivityPub::Activity::Accept < ActivityPub::Activity
     is_first_follow = !request.target_account.followers.local.exists?
     request.authorize!
 
-    RemoteAccountRefreshWorker.perform_async(request.target_account_id) if is_first_follow
+    RemoteAccountRefreshJob.perform_later(request.target_account_id) if is_first_follow
   end
 
   def accept_follow_for_relay

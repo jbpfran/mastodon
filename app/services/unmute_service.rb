@@ -6,6 +6,6 @@ class UnmuteService < BaseService
 
     account.unmute!(target_account)
 
-    MergeWorker.perform_async(target_account.id, account.id) if account.following?(target_account)
+    MergeJob.perform_later(target_account.id, account.id) if account.following?(target_account)
   end
 end

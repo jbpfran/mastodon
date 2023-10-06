@@ -20,11 +20,11 @@ RSpec.describe FollowRequest do
       end
     end
 
-    it 'calls Account#follow!, MergeWorker.perform_async, and #destroy!' do
+    it 'calls Account#follow!, MergeJob.perform_later, and #destroy!' do
       expect(account).to receive(:follow!).with(target_account, reblogs: true, notify: false, uri: follow_request.uri, languages: nil, bypass_limit: true) do
         account.active_relationships.create!(target_account: target_account)
       end
-      expect(MergeWorker).to receive(:perform_async).with(target_account.id, account.id)
+      expect(MergeJob).to receive(:perform_later).with(target_account.id, account.id)
       expect(follow_request).to receive(:destroy!)
       follow_request.authorize!
     end

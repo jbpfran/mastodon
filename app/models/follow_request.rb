@@ -34,7 +34,7 @@ class FollowRequest < ApplicationRecord
   def authorize!
     follow = account.follow!(target_account, reblogs: show_reblogs, notify: notify, languages: languages, uri: uri, bypass_limit: true)
     ListAccount.where(follow_request: self).update_all(follow_request_id: nil, follow_id: follow.id) # rubocop:disable Rails/SkipsModelValidations
-    MergeWorker.perform_async(target_account.id, account.id) if account.local?
+    MergeJob.perform_later(target_account.id, account.id) if account.local?
     destroy!
   end
 

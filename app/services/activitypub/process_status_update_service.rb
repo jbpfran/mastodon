@@ -111,7 +111,7 @@ class ActivityPub::ProcessStatusUpdateService < BaseService
       media_attachment.download_thumbnail! if media_attachment.thumbnail_remote_url_previously_changed?
       media_attachment.save
     rescue Mastodon::UnexpectedResponseError, HTTP::TimeoutError, HTTP::ConnectionError, OpenSSL::SSL::SSLError
-      RedownloadMediaWorker.perform_in(rand(30..600).seconds, media_attachment.id)
+      RedownloadMediaJob.set(wait: rand(30..600).seconds).perform_later(media_attachment.id)
     rescue Seahorse::Client::NetworkingError => e
       Rails.logger.warn "Error storing media attachment: #{e}"
     end
@@ -282,11 +282,11 @@ class ActivityPub::ProcessStatusUpdateService < BaseService
 
   def reset_preview_card!
     @status.preview_cards.clear
-    LinkCrawlWorker.perform_in(rand(1..59).seconds, @status.id)
+    LinkCrawlJob.set(wait: rand(1..59).seconds).perform_later(@status.id)
   end
 
   def broadcast_updates!
-    ::DistributionWorker.perform_async(@status.id, { 'update' => true })
+    ::DistributionJob.perform_later(@status.id, { 'update' => true })
   end
 
   def queue_poll_notifications!

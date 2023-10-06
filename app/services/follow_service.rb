@@ -81,7 +81,7 @@ class FollowService < BaseService
     follow = @source_account.follow!(@target_account, **follow_options.merge(rate_limit: @options[:with_rate_limit], bypass_limit: @options[:bypass_limit]))
 
     LocalNotificationJob.perform_later(@target_account.id, follow.id, follow.class.name, 'follow')
-    MergeWorker.perform_async(@target_account.id, @source_account.id)
+    MergeJob.perform_later(@target_account.id, @source_account.id)
 
     follow
   end
